@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocialFlow AI - Automated Social Media Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+        }
+        
+        .grain-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .glass-card {
+            background: rgba(30, 30, 50, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .soft-button {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .soft-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+        
+        .ai-agent-card {
+            background: linear-gradient(135deg, rgba(40, 40, 70, 0.6) 0%, rgba(20, 20, 40, 0.4) 100%);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .ai-agent-card:hover {
+            transform: translateY(-5px);
+            background: linear-gradient(135deg, rgba(50, 50, 80, 0.7) 0%, rgba(30, 30, 50, 0.5) 100%);
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, rgba(30, 30, 60, 0.5) 0%, rgba(20, 20, 40, 0.3) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .trend-pill {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .activity-item {
+            background: rgba(30, 30, 50, 0.4);
+            backdrop-filter: blur(8px);
+            border-left: 3px solid #3b82f6;
+        }
+        
+        .platform-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        .instagram-gradient { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+        .twitter-gradient { background: linear-gradient(45deg, #1da1f2 0%, #0d8bd9 100%); }
+        .linkedin-gradient { background: linear-gradient(45deg, #0077b5 0%, #005885 100%); }
+        .tiktok-gradient { background: linear-gradient(45deg, #ff0050 0%, #000000 100%); }
+        .youtube-gradient { background: linear-gradient(45deg, #ff0000 0%, #cc0000 100%); }
+        
+        .pulse-dot {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .floating-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.5s ease-out forwards;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 50%, #f472b6 100%);
+            height: 6px;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        
+        .nav-tab {
+            background: rgba(30, 30, 50, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tab.active {
+            background: rgba(59, 130, 246, 0.3);
+            border: 1px solid rgba(59, 130, 246, 0.5);
+        }
+        
+        .ai-status-online {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+        
+        .ai-status-processing {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+        }
+        
+        .content-preview {
+            background: rgba(25, 25, 45, 0.4);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+    </style>
+</head>
+<body>
+    <div class="grain-overlay"></div>
+    
+    <!-- Navigation -->
+    <nav class="glass-card fixed top-4 left-4 right-4 z-50 rounded-2xl p-4">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
+                    <span class="text-white font-bold text-lg">S</span>
+                </div>
+                <h1 class="text-xl font-bold text-white">SocialFlow AI</h1>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+                <button class="nav-tab active px-4 py-2 rounded-xl text-white text-sm font-medium" data-tab="dashboard">
+                    Dashboard
+                </button>
+                <button class="nav-tab px-4 py-2 rounded-xl text-white text-sm font-medium" data-tab="agents">
+                    AI Agents
+                </button>
+                <button class="nav-tab px-4 py-2 rounded-xl text-white text-sm font-medium" data-tab="content">
+                    Content
+                </button>
+                <button class="nav-tab px-4 py-2 rounded-xl text-white text-sm font-medium" data-tab="analytics">
+                    Analytics
+                </button>
+            </div>
+            
+            <div class="flex items-center space-x-3">
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 bg-green-400 rounded-full pulse-dot"></div>
+                    <span class="text-white text-sm">5 Agents Active</span>
+                </div>
+                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full"></div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <div class="pt-24 pb-8 px-4">
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content">
+            <div class="max-w-7xl mx-auto space-y-6">
+                <!-- Hero Section -->
+                <div class="glass-card rounded-3xl p-8 text-center">
+                    <h2 class="text-4xl font-bold text-white mb-4">
+                        Your AI Social Media Empire
+                    </h2>
+                    <p class="text-xl text-white/80 mb-8 max-w-3xl mx-auto">
+                        5 AI agents working 24/7 to grow your presence across all platforms. 
+                        Trending content, smart engagement, and automated growth.
+                    </p>
+                    
+                    <!-- Quick Stats -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                        <div class="metric-card rounded-2xl p-6">
+                            <div class="text-3xl font-bold text-white mb-2" id="postsToday">0</div>
+                            <div class="text-white/70 text-sm">Posts Today</div>
+                        </div>
+                        <div class="metric-card rounded-2xl p-6">
+                            <div class="text-3xl font-bold text-white mb-2" id="engagements">0</div>
+                            <div class="text-white/70 text-sm">Engagements</div>
+                        </div>
+                        <div class="metric-card rounded-2xl p-6">
+                            <div class="text-3xl font-bold text-white mb-2" id="followers">0</div>
+                            <div class="text-white/70 text-sm">New Followers</div>
+                        </div>
+                        <div class="metric-card rounded-2xl p-6">
+                            <div class="text-3xl font-bold text-white mb-2" id="trendsFound">0</div>
+                            <div class="text-white/70 text-sm">Trends Found</div>
+                        </div>
+                    </div>
+                    
+                    <button onclick="startAutomation()" class="soft-button px-8 py-4 rounded-2xl text-white font-semibold text-lg">
+                        🚀 Launch AI Automation
+                    </button>
+                </div>
+                
+                <!-- Platform Status -->
+                <div class="grid md:grid-cols-5 gap-4">
+                    <div class="ai-agent-card rounded-2xl p-6 text-center floating-animation">
+                        <div class="platform-icon instagram-gradient mx-auto mb-4">📷</div>
+                        <h3 class="text-white font-semibold mb-2">Instagram</h3>
+                        <div class="ai-status-online w-3 h-3 rounded-full mx-auto mb-2"></div>
+                        <div class="text-white/70 text-sm">3 posts scheduled</div>
+                    </div>
+                    
+                    <div class="ai-agent-card rounded-2xl p-6 text-center floating-animation" style="animation-delay: 0.2s">
+                        <div class="platform-icon twitter-gradient mx-auto mb-4">🐦</div>
+                        <h3 class="text-white font-semibold mb-2">Twitter</h3>
+                        <div class="ai-status-processing w-3 h-3 rounded-full mx-auto mb-2"></div>
+                        <div class="text-white/70 text-sm">Analyzing trends</div>
+                    </div>
+                    
+                    <div class="ai-agent-card rounded-2xl p-6 text-center floating-animation" style="animation-delay: 0.4s">
+                        <div class="platform-icon linkedin-gradient mx-auto mb-4">💼</div>
+                        <h3 class="text-white font-semibold mb-2">LinkedIn</h3>
+                        <div class="ai-status-online w-3 h-3 rounded-full mx-auto mb-2"></div>
+                        <div class="text-white/70 text-sm">Engaging with leads</div>
+                    </div>
+                    
+                    <div class="ai-agent-card rounded-2xl p-6 text-center floating-animation" style="animation-delay: 0.6s">
+                        <div class="platform-icon tiktok-gradient mx-auto mb-4">🎵</div>
+                        <h3 class="text-white font-semibold mb-2">TikTok</h3>
+                        <div class="ai-status-online w-3 h-3 rounded-full mx-auto mb-2"></div>
+                        <div class="text-white/70 text-sm">Video ready</div>
+                    </div>
+                    
+                    <div class="ai-agent-card rounded-2xl p-6 text-center floating-animation" style="animation-delay: 0.8s">
+                        <div class="platform-icon youtube-gradient mx-auto mb-4">📺</div>
+                        <h3 class="text-white font-semibold mb-2">YouTube</h3>
+                        <div class="ai-status-processing w-3 h-3 rounded-full mx-auto mb-2"></div>
+                        <div class="text-white/70 text-sm">Scripting content</div>
+                    </div>
+                </div>
+                
+                <!-- Live Activity Feed -->
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="glass-card rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-white mb-6">🔥 Trending Now</h3>
+                        <div class="space-y-3" id="trendingTopics">
+                            <div class="trend-pill rounded-xl p-3 flex items-center justify-between">
+                                <span class="text-white">#AIRevolution</span>
+                                <span class="text-white/70 text-sm">🔥 Hot</span>
+                            </div>
+                            <div class="trend-pill rounded-xl p-3 flex items-center justify-between">
+                                <span class="text-white">#TechTrends2024</span>
+                                <span class="text-white/70 text-sm">📈 Rising</span>
+                            </div>
+                            <div class="trend-pill rounded-xl p-3 flex items-center justify-between">
+                                <span class="text-white">#SocialMediaTips</span>
+                                <span class="text-white/70 text-sm">⭐ Stable</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-card rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-white mb-6">⚡ Live Activity</h3>
+                        <div class="space-y-3" id="liveActivity">
+                            <div class="activity-item rounded-xl p-3 slide-in">
+                                <div class="flex items-center space-x-3">
+                                    <div class="platform-icon instagram-gradient">📷</div>
+                                    <div class="flex-1">
+                                        <div class="text-white text-sm">Posted trending content</div>
+                                        <div class="text-white/70 text-xs">2 minutes ago</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="activity-item rounded-xl p-3 slide-in">
+                                <div class="flex items-center space-x-3">
+                                    <div class="platform-icon twitter-gradient">🐦</div>
+                                    <div class="flex-1">
+                                        <div class="text-white text-sm">Engaged with 15 accounts</div>
+                                        <div class="text-white/70 text-xs">5 minutes ago</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="activity-item rounded-xl p-3 slide-in">
+                                <div class="flex items-center space-x-3">
+                                    <div class="platform-icon linkedin-gradient">💼</div>
+                                    <div class="flex-1">
+                                        <div class="text-white text-sm">Connected with 8 prospects</div>
+                                        <div class="text-white/70 text-xs">12 minutes ago</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- AI Agents Tab -->
+        <div id="agents" class="tab-content hidden">
+            <div class="max-w-7xl mx-auto space-y-6">
+                <div class="glass-card rounded-3xl p-8">
+                    <h2 class="text-3xl font-bold text-white mb-8">🤖 AI Agent Control Center</h2>
+                    
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Trend Hunter Agent -->
+                        <div class="ai-agent-card rounded-2xl p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-xl font-bold text-white">🔍 Trend Hunter</h3>
+                                <div class="ai-status-online w-4 h-4 rounded-full"></div>
+                            </div>
+                            <p class="text-white/70 mb-4">Scans 1000+ sources for trending topics and viral content opportunities</p>
+                            <div class="space-y-2 mb-4">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-white/70">Trends Found Today</span>
+                                    <span class="text-white font-semibold">47</span>
+                                </div>
+                                <div class="progress-bar" style="width: 85%"></div>
+                            </div>
+                            <button class="soft-button w-full py-2 rounded-xl text-white font-medium">Configure</button>
+                        </div>
+                        
+                        <!-- Content Creator Agent -->
+                        <div class="ai-agent-card rounded-2xl p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-xl font-bold text-white">✍️ Content Creator</h3>
+                                <div class="ai-status-processing w-4 h-4 rounded-full"></div>
+                            </div>
+                            <p class="text-white/70 mb-4">Generates engaging posts, captions, and hashtags tailored to each platform</p>
+                            <div class="space-y-2 mb-4">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-white/70">Posts Generated</span>
+                                    <span class="text-white font-semibold">23</span>
+                                </div>
+                                <div class="progress-bar" style="width: 65%"></div>
+                            </div>
+                            <button class="soft-button w-full py-2 rounded-xl text-white font-medium">Configure</button>
+                        </div>
+                        
+                        <!-- Engagement Bot -->
+                        <div class="ai-agent-card rounded-2xl p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-xl font-bold text-white">💬 Engagement Bot</h3>
+                                <div class="ai-status-online w-4 h-4 rounded-full"></div>
+                            </div>
+                            <p class="text-white/70 mb-4">Intelligently likes, comments, and follows relevant accounts in your niche</p>
+                            <div class="space-y-2 mb-4">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-white/70">Interactions Today</span>
+                                    <span class="text-white font-semibold">342</span>
+                                </div>
+                                <div class="progress-bar" style="width: 92%"></div>
+                            </div>
+                            <button class="soft-button w-full py-2 rounded-xl text-white font-medium">Configure</button>
+                        </div>
+                        
+                        <!-- Analytics Agent -->
+                        <div class="ai-agent-card rounded-2xl p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-xl font-bold text-white">📊 Analytics Agent</h3>
+                                <div class="ai-status-online w-4 h-4 rounded-full"></div>
+                            </div>
+                            <p class="text-white/70 mb-4">Tracks performance metrics and optimizes posting times and content strategy</p>
+                            <div class="space-y-2 mb-4">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-white/70">Reports Generated</span>
+                                    <span class="text-white font-semibold">12</span>
+                                </div>
+                                <div class="progress-bar" style="width: 78%"></div>
+                            </div>
+                            <button class="soft-button w-full py-2 rounded-xl text-white font-medium">Configure</button>
+                        </div>
+                        
+                        <!-- DM Responder -->
+                        <div class="ai-agent-card rounded-2xl p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-xl font-bold text-white">💌 DM Responder</h3>
+                                <div class="ai-status-processing w-4 h-4 rounded-full"></div>
+                            </div>
+                            <p class="text-white/70 mb-4">Handles direct messages and comments with personalized, human-like responses</p>
+                            <div class="space-y-2 mb-4">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-white/70">Messages Handled</span>
+                                    <span class="text-white font-semibold">89</span>
+                                </div>
+                                <div class="progress-bar" style="width: 71%"></div>
+                            </div>
+                            <button class="soft-button w-full py-2 rounded-xl text-white font-medium">Configure</button>
+                        </div>
+                        
+                        <!-- Growth Hacker -->
+                        <div class="ai-agent-card rounded-2xl p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-xl font-bold text-white">🚀 Growth Hacker</h3>
+                                <div class="ai-status-online w-4 h-4 rounded-full"></div>
+                            </div>
+                            <p class="text-white/70 mb-4">Implements advanced growth strategies and identifies collaboration opportunities</p>
+                            <div class="space-y-2 mb-4">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-white/70">Growth Actions</span>
+                                    <span class="text-white font-semibold">156</span>
+                                </div>
+                                <div class="progress-bar" style="width: 88%"></div>
+                            </div>
+                            <button class="soft-button w-full py-2 rounded-xl text-white font-medium">Configure</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Content Tab -->
+        <div id="content" class="tab-content hidden">
+            <div class="max-w-7xl mx-auto space-y-6">
+                <div class="glass-card rounded-3xl p-8">
+                    <h2 class="text-3xl font-bold text-white mb-8">📝 AI-Generated Content</h2>
+                    
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Instagram Post -->
+                        <div class="content-preview rounded-2xl p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="platform-icon instagram-gradient">📷</div>
+                                <span class="text-white/70 text-sm">Ready to post</span>
+                            </div>
+                            <div class="bg-black/20 rounded-xl p-4 mb-4">
+                                <p class="text-white text-sm mb-2">🚀 The future of social media is here! AI agents are revolutionizing how we create and engage online. What's your take on automated content? 🤖✨</p>
+                                <p class="text-white/70 text-xs">#AIRevolution #SocialMediaTips #TechTrends #Automation</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="soft-button flex-1 py-2 rounded-xl text-white text-sm">Post Now</button>
+                                <button class="glass-card px-4 py-2 rounded-xl text-white text-sm">Edit</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Twitter Thread -->
+                        <div class="content-preview rounded-2xl p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="platform-icon twitter-gradient">🐦</div>
+                                <span class="text-white/70 text-sm">Thread (5 tweets)</span>
+                            </div>
+                            <div class="bg-black/20 rounded-xl p-4 mb-4">
+                                <p class="text-white text-sm mb-2">1/5 🧵 Why AI automation is the game-changer for content creators...</p>
+                                <p class="text-white/70 text-xs">Thread about AI trends and automation benefits</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="soft-button flex-1 py-2 rounded-xl text-white text-sm">Schedule</button>
+                                <button class="glass-card px-4 py-2 rounded-xl text-white text-sm">Preview</button>
+                            </div>
+                        </div>
+                        
+                        <!-- LinkedIn Article -->
+                        <div class="content-preview rounded-2xl p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="platform-icon linkedin-gradient">💼</div>
+                                <span class="text-white/70 text-sm">Long-form article</span>
+                            </div>
+                            <div class="bg-black/20 rounded-xl p-4 mb-4">
+                                <p class="text-white text-sm mb-2">The Rise of AI in Professional Networking: A Deep Dive</p>
+                                <p class="text-white/70 text-xs">2,400 words • Professional insights on AI automation</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="soft-button flex-1 py-2 rounded-xl text-white text-sm">Publish</button>
+                                <button class="glass-card px-4 py-2 rounded-xl text-white text-sm">Review</button>
+                            </div>
+                        </div>
+                        
+                        <!-- TikTok Video Script -->
+                        <div class="content-preview rounded-2xl p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="platform-icon tiktok-gradient">🎵</div>
+                                <span class="text-white/70 text-sm">Video script</span>
+                            </div>
+                            <div class="bg-black/20 rounded-xl p-4 mb-4">
+                                <p class="text-white text-sm mb-2">"POV: Your AI agent just found the perfect trending sound..."</p>
+                                <p class="text-white/70 text-xs">30-second script with trending audio match</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="soft-button flex-1 py-2 rounded-xl text-white text-sm">Create Video</button>
+                                <button class="glass-card px-4 py-2 rounded-xl text-white text-sm">Edit Script</button>
+                            </div>
+                        </div>
+                        
+                        <!-- YouTube Video Outline -->
+                        <div class="content-preview rounded-2xl p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="platform-icon youtube-gradient">📺</div>
+                                <span class="text-white/70 text-sm">Video outline</span>
+                            </div>
+                            <div class="bg-black/20 rounded-xl p-4 mb-4">
+                                <p class="text-white text-sm mb-2">How I Automated My Entire Social Media Strategy</p>
+                                <p class="text-white/70 text-xs">12-minute video • Complete tutorial format</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="soft-button flex-1 py-2 rounded-xl text-white text-sm">Start Recording</button>
+                                <button class="glass-card px-4 py-2 rounded-xl text-white text-sm">Refine</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Cross-Platform Campaign -->
+                        <div class="content-preview rounded-2xl p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex -space-x-2">
+                                    <div class="platform-icon instagram-gradient w-8 h-8 text-sm">📷</div>
+                                    <div class="platform-icon twitter-gradient w-8 h-8 text-sm">🐦</div>
+                                    <div class="platform-icon linkedin-gradient w-8 h-8 text-sm">💼</div>
+                                </div>
+                                <span class="text-white/70 text-sm">Campaign ready</span>
+                            </div>
+                            <div class="bg-black/20 rounded-xl p-4 mb-4">
+                                <p class="text-white text-sm mb-2">AI Automation Week Campaign</p>
+                                <p class="text-white/70 text-xs">7 days • 21 posts across all platforms</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="soft-button flex-1 py-2 rounded-xl text-white text-sm">Launch Campaign</button>
+                                <button class="glass-card px-4 py-2 rounded-xl text-white text-sm">Preview All</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Analytics Tab -->
+        <div id="analytics" class="tab-content hidden">
+            <div class="max-w-7xl mx-auto space-y-6">
+                <div class="glass-card rounded-3xl p-8">
+                    <h2 class="text-3xl font-bold text-white mb-8">📈 Performance Analytics</h2>
+                    
+                    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="metric-card rounded-2xl p-6 text-center">
+                            <div class="text-4xl font-bold gradient-text mb-2">2.4M</div>
+                            <div class="text-white/70">Total Reach</div>
+                            <div class="text-green-400 text-sm mt-2">↗ +23% this week</div>
+                        </div>
+                        <div class="metric-card rounded-2xl p-6 text-center">
+                            <div class="text-4xl font-bold gradient-text mb-2">89.2%</div>
+                            <div class="text-white/70">Engagement Rate</div>
+                            <div class="text-green-400 text-sm mt-2">↗ +15% this week</div>
+                        </div>
+                        <div class="metric-card rounded-2xl p-6 text-center">
+                            <div class="text-4xl font-bold gradient-text mb-2">1,247</div>
+                            <div class="text-white/70">New Followers</div>
+                            <div class="text-green-400 text-sm mt-2">↗ +31% this week</div>
+                        </div>
+                        <div class="metric-card rounded-2xl p-6 text-center">
+                            <div class="text-4xl font-bold gradient-text mb-2">$12.4K</div>
+                            <div class="text-white/70">Revenue Generated</div>
+                            <div class="text-green-400 text-sm mt-2">↗ +45% this week</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Platform Breakdown -->
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="glass-card rounded-2xl p-6">
+                            <h3 class="text-xl font-bold text-white mb-6">Platform Performance</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="platform-icon instagram-gradient">📷</div>
+                                        <span class="text-white">Instagram</span>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-white font-semibold">847K reach</div>
+                                        <div class="text-green-400 text-sm">+18%</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="platform-icon twitter-gradient">🐦</div>
+                                        <span class="text-white">Twitter</span>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-white font-semibold">623K reach</div>
+                                        <div class="text-green-400 text-sm">+25%</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="platform-icon linkedin-gradient">💼</div>
+                                        <span class="text-white">LinkedIn</span>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-white font-semibold">456K reach</div>
+                                        <div class="text-green-400 text-sm">+32%</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="platform-icon tiktok-gradient">🎵</div>
+                                        <span class="text-white">TikTok</span>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-white font-semibold">289K reach</div>
+                                        <div class="text-green-400 text-sm">+67%</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="platform-icon youtube-gradient">📺</div>
+                                        <span class="text-white">YouTube</span>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-white font-semibold">234K reach</div>
+                                        <div class="text-green-400 text-sm">+12%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="glass-card rounded-2xl p-6">
+                            <h3 class="text-xl font-bold text-white mb-6">Top Performing Content</h3>
+                            <div class="space-y-4">
+                                <div class="bg-black/20 rounded-xl p-4">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-white font-medium">AI Automation Tips</span>
+                                        <div class="platform-icon instagram-gradient">📷</div>
+                                    </div>
+                                    <div class="text-white/70 text-sm mb-2">47.2K likes • 2.1K comments</div>
+                                    <div class="progress-bar" style="width: 95%"></div>
+                                </div>
+                                <div class="bg-black/20 rounded-xl p-4">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-white font-medium">Future of Social Media</span>
+                                        <div class="platform-icon twitter-gradient">🐦</div>
+                                    </div>
+                                    <div class="text-white/70 text-sm mb-2">23.8K retweets • 5.4K replies</div>
+                                    <div class="progress-bar" style="width: 87%"></div>
+                                </div>
+                                <div class="bg-black/20 rounded-xl p-4">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-white font-medium">AI Tools Review</span>
+                                        <div class="platform-icon youtube-gradient">📺</div>
+                                    </div>
+                                    <div class="text-white/70 text-sm mb-2">156K views • 8.9K likes</div>
+                                    <div class="progress-bar" style="width: 92%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const targetTab = this.getAttribute('data-tab');
+                
+                // Update active tab
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Show target content
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.add('hidden');
+                });
+                document.getElementById(targetTab).classList.remove('hidden');
+            });
+        });
+        
+        // Animated counters
+        function animateCounter(element, target, duration = 2000) {
+            let start = 0;
+            const increment = target / (duration / 16);
+            
+            const timer = setInterval(() => {
+                start += increment;
+                if (start >= target) {
+                    start = target;
+                    clearInterval(timer);
+                }
+                
+                if (target >= 1000) {
+                    element.textContent = (start / 1000).toFixed(1) + 'K';
+                } else {
+                    element.textContent = Math.floor(start);
+                }
+            }, 16);
+        }
+        
+        // Initialize counters
+        document.addEventListener('DOMContentLoaded', function() {
+            animateCounter(document.getElementById('postsToday'), 23);
+            animateCounter(document.getElementById('engagements'), 1247);
+            animateCounter(document.getElementById('followers'), 89);
+            animateCounter(document.getElementById('trendsFound'), 47);
+        });
+        
+        // Live activity simulation
+        const activities = [
+            { platform: 'instagram', icon: '📷', action: 'Posted trending content', time: '2 minutes ago' },
+            { platform: 'twitter', icon: '🐦', action: 'Engaged with 15 accounts', time: '5 minutes ago' },
+            { platform: 'linkedin', icon: '💼', action: 'Connected with 8 prospects', time: '12 minutes ago' },
+            { platform: 'tiktok', icon: '🎵', action: 'Video reached 10K views', time: '18 minutes ago' },
+            { platform: 'youtube', icon: '📺', action: 'New subscriber milestone', time: '25 minutes ago' }
+        ];
+        
+        function addLiveActivity() {
+            const activityFeed = document.getElementById('liveActivity');
+            const randomActivity = activities[Math.floor(Math.random() * activities.length)];
+            
+            const activityElement = document.createElement('div');
+            activityElement.className = 'activity-item rounded-xl p-3 slide-in';
+            activityElement.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <div class="platform-icon ${randomActivity.platform}-gradient">${randomActivity.icon}</div>
+                    <div class="flex-1">
+                        <div class="text-white text-sm">${randomActivity.action}</div>
+                        <div class="text-white/70 text-xs">Just now</div>
+                    </div>
+                </div>
+            `;
+            
+            activityFeed.insertBefore(activityElement, activityFeed.firstChild);
+            
+            // Remove oldest activity if more than 5
+            if (activityFeed.children.length > 5) {
+                activityFeed.removeChild(activityFeed.lastChild);
+            }
+        }
+        
+        // Add new activity every 10 seconds
+        setInterval(addLiveActivity, 10000);
+        
+        // Trending topics rotation
+        const trendingTopics = [
+            { tag: '#AIRevolution', status: '🔥 Hot' },
+            { tag: '#TechTrends2024', status: '📈 Rising' },
+            { tag: '#SocialMediaTips', status: '⭐ Stable' },
+            { tag: '#AutomationLife', status: '🚀 Viral' },
+            { tag: '#ContentCreator', status: '💡 Growing' },
+            { tag: '#DigitalMarketing', status: '📊 Trending' }
+        ];
+        
+        function updateTrendingTopics() {
+            const container = document.getElementById('trendingTopics');
+            const shuffled = [...trendingTopics].sort(() => 0.5 - Math.random()).slice(0, 3);
+            
+            container.innerHTML = shuffled.map(trend => `
+                <div class="trend-pill rounded-xl p-3 flex items-center justify-between">
+                    <span class="text-white">${trend.tag}</span>
+                    <span class="text-white/70 text-sm">${trend.status}</span>
+                </div>
+            `).join('');
+        }
+        
+        // Update trending topics every 30 seconds
+        setInterval(updateTrendingTopics, 30000);
+        
+        // Start automation function
+        function startAutomation() {
+            const button = event.target;
+            const originalText = button.textContent;
+            
+            button.textContent = '🔄 Initializing AI Agents...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.textContent = '✅ Automation Active';
+                button.classList.add('ai-status-online');
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.disabled = false;
+                    button.classList.remove('ai-status-online');
+                }, 3000);
+            }, 2000);
+        }
+        
+        // Simulate real-time updates
+        function simulateRealTimeUpdates() {
+            // Update agent statuses randomly
+            const agents = document.querySelectorAll('.ai-status-online, .ai-status-processing');
+            agents.forEach(agent => {
+                if (Math.random() > 0.7) {
+                    agent.classList.toggle('ai-status-online');
+                    agent.classList.toggle('ai-status-processing');
+                }
+            });
+            
+            // Update progress bars
+            const progressBars = document.querySelectorAll('.progress-bar');
+            progressBars.forEach(bar => {
+                const currentWidth = parseInt(bar.style.width) || 0;
+                const newWidth = Math.min(100, currentWidth + Math.random() * 5);
+                bar.style.width = newWidth + '%';
+            });
+        }
+        
+        // Run real-time updates every 5 seconds
+        setInterval(simulateRealTimeUpdates, 5000);
+        
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTrendingTopics();
+            
+            // Add some initial floating animations with delays
+            const floatingElements = document.querySelectorAll('.floating-animation');
+            floatingElements.forEach((element, index) => {
+                element.style.animationDelay = (index * 0.2) + 's';
+            });
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96af45ec16705560',t:'MTc1NDQ5MTA1Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
